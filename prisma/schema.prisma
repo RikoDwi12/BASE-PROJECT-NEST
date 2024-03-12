@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id           Int       @id @default(autoincrement())
+  name         String
+  jobTitle     String
+  created_at   DateTime      @default(now()) @db.Timestamptz(3)
+  updated_at   DateTime      @updatedAt @db.Timestamptz(3)
+  deleted_at   DateTime?     @db.Timestamptz(3)
+  phone        String
+}
+
+model Role {
+  id           Int       @id @default(autoincrement())
+  name         String
+  users        User[]    // Menambah relasi dengan model User
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String
+  password     String
+  created_at   DateTime      @default(now()) @db.Timestamptz(3)
+  updated_at   DateTime      @updatedAt @db.Timestamptz(3)
+  deleted_at   DateTime?     @db.Timestamptz(3)
+  role         Role       @relation(fields: [role_id], references: [id])
+  role_id      Int
+}
+
+model Dispute {
+  id             Int       @id @default(autoincrement())
+  title          String
+  desc           String
+  id_employee    Int
+}
+
+enum RequestTerm {
+  SICK_LEAVE
+  ABSENCE
+}
+
+model Request {
+  id           Int       @id @default(autoincrement())
+  request      RequestTerm
+  desc         String
+  attachment   String
+}
+
+model Attendance {
+  id            Int       @id @default(autoincrement())
+  employee_id   Int
+  checkin       DateTime?
+  checkout      DateTime?
+}
+
+model Calendar {
+  id            Int       @id @default(autoincrement())
+  attendance_id Int
+  dispute_id    Int
+  request_id    Int
+}
